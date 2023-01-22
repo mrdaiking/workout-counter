@@ -2,9 +2,14 @@ package demo.app.workoutcounter
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.widget.Toast
 import demo.app.workoutcounter.databinding.ActivityExerciseBinding
 
 class ExerciseActivity : AppCompatActivity() {
+    private var restProgress: Int = 0
+    private var restTimer: CountDownTimer? = null // Variable for timer progress. As initial value the rest progress is set to 0. As we are about to start.
+
     private var binding : ActivityExerciseBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,5 +25,56 @@ class ExerciseActivity : AppCompatActivity() {
         binding?.toolbarExercise?.setNavigationOnClickListener {
             onBackPressed()
         }
+
+        setupRestView()
+
+    }
+
+    // TODO (Step 3 - Setting up the Get Ready View with 10 seconds of timer.)
+    /**
+     * Function is used to get the timer for REST
+     */
+    private fun setupRestView() {
+        /**
+         * Here firstly we will check if the timer is running the and it is not null
+         * then cancel the running timer and start the new one.
+         * And set the progress to initial which is 0
+         */
+        if(restTimer != null) {
+            restTimer!!.cancel()
+            restProgress = 0
+        }
+
+        // This function is used to set the progress details
+        setRestProgressBar()
+    }
+
+    // TODO (Step 2 - Setting up the 10 seconds timer for rest view and updating it continuously
+    /**
+     * Function is used to get the progress of timer using the progress
+     */
+    private fun setRestProgressBar() {
+        binding?.progressBar?.progress = restProgress
+        restTimer = object : CountDownTimer(10000, 1000) {
+            override fun onTick(p0: Long) {
+                restProgress++
+                binding?.progressBar?.progress = 10 - restProgress
+                binding?.tvTimer?.text = (10 -restProgress).toString()
+            }
+
+            override fun onFinish() {
+                Toast.makeText(this@ExerciseActivity, "Here now we will start the exercise.", Toast.LENGTH_SHORT).show()
+            }
+        }.start()
+    }
+
+    override fun onDestroy() {
+        if (restTimer != null) {
+            restTimer?.cancel()
+            restProgress = 0
+        }
+
+        super.onDestroy()
+        binding = null
     }
 }
